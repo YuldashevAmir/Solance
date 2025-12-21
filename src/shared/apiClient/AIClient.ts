@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { INotification } from 'src/notification/notification.types'
+import { INotification } from '../../notification/notification.types'
 import { ConfigService } from '../config/config.service'
 
 @Injectable()

@@ -1,9 +1,8 @@
 import { Injectable, OnModuleInit } from '@nestjs/common'
-
-import { NotificationService } from 'src/notification/notification.service'
-import { ConfigService } from 'src/shared/config/config.service'
-import { getFormattedText } from 'src/shared/utils/textFormat.util'
 import { Telegraf } from 'telegraf'
+import { NotificationService } from '../notification/notification.service'
+import { ConfigService } from '../shared/config/config.service'
+import { getFormattedText } from '../shared/utils/textFormat.util'
 
 @Injectable()
 export class TelegramService implements OnModuleInit {

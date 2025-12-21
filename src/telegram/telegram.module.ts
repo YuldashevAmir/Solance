@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
-import { NotificationModule } from 'src/notification/notification.module'
-import { ConfigModule } from 'src/shared/config/config.module'
+import { NotificationModule } from '../notification/notification.module'
+import { ConfigModule } from '../shared/config/config.module'
 import { TelegramService } from './telegram.service'
 
 @Module({

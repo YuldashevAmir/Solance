@@ -1,8 +1,7 @@
-// src/notification/notification.service.ts
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import { AIClient } from 'src/shared/apiClient/AIClient'
+import { AIClient } from '../shared/apiClient/AIClient'
 import { NotificationModel } from './notification.schema'
 import { INotification } from './notification.types'
 
