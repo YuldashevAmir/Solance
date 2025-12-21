@@ -1,4 +1,3 @@
-// src/notification/notification.schema.ts
 import { Schema as NestSchema, Prop, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 
