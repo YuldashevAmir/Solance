@@ -21,7 +21,10 @@ export class AIClient {
 		}
 	}
 
-	async getAIResponse(userMessage: string): Promise<INotification | null> {
+	async getAIResponse(
+		userMessage: string,
+		chatId: string
+	): Promise<INotification | null> {
 		try {
 			const response = await fetch(this.apiUrl, {
 				method: 'POST',
@@ -43,9 +46,11 @@ export class AIClient {
 
 			const data = await response.json()
 			const aiMessage = data.choices?.[0]?.message?.content
-			console.log('Received from AI:', aiMessage)
+
 			const parsedData =
 				typeof aiMessage === 'string' ? JSON.parse(aiMessage) : aiMessage
+
+			parsedData.chatId = chatId
 
 			return parsedData || null
 		} catch (error) {
