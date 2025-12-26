@@ -98,9 +98,10 @@ w — weeks (английский эквивалент)
 
 		this.bot.on('text', async ctx => {
 			try {
+				const chatId = ctx.chat.id.toString()
 				const userMessage = ctx.message.text
 				const addedNotification =
-					await this.notificationService.addNotification(userMessage)
+					await this.notificationService.addNotification(userMessage, chatId)
 
 				const message = getFormattedText(addedNotification)
 				try {
@@ -129,5 +130,9 @@ w — weeks (английский эквивалент)
 
 	stopBot() {
 		this.bot.stop('SIGINT')
+	}
+
+	async sendMessage(chatId: string, text: string) {
+		await this.bot.telegram.sendMessage(chatId, text)
 	}
 }
