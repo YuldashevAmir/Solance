@@ -19,7 +19,7 @@ export class NotificationScheduler {
 	async handleReminders() {
 		const now = new Date()
 		const lastMinute = new Date(now.getTime() - 60_000)
-
+		console.log(now, '\n', lastMinute)
 		const notifications = await this.notificationModel.find({
 			reminders: {
 				$elemMatch: {
