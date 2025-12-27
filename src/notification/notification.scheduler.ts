@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import { Model } from 'mongoose'
@@ -7,6 +7,8 @@ import { Notification } from './notification.schema'
 
 @Injectable()
 export class NotificationScheduler {
+	private readonly logger = new Logger(NotificationScheduler.name)
+
 	constructor(
 		@InjectModel(Notification.name)
 		private readonly notificationModel: Model<Notification>,
@@ -20,17 +22,28 @@ export class NotificationScheduler {
 
 		const notifications = await this.notificationModel.find({
 			reminders: {
-				$elemMatch: { $lte: now, $gte: lastMinute },
+				$elemMatch: {
+					$gte: lastMinute,
+					$lte: now,
+				},
+			},
+			$expr: {
+				$gt: [
+					{
+						$size: {
+							$setDifference: ['$reminders', '$sentReminders'],
+						},
+					},
+					0,
+				],
 			},
 		})
-
-		console.log('notifications: ', notifications)
 
 		for (const notification of notifications) {
 			const dueReminders = notification.reminders.filter(
 				r =>
-					r <= now &&
 					r >= lastMinute &&
+					r <= now &&
 					!notification.sentReminders.some(
 						sent => sent.getTime() === r.getTime()
 					)
@@ -43,13 +56,23 @@ export class NotificationScheduler {
 						`⏰ Reminder:\n${notification.message}`
 					)
 
-					notification.sentReminders.push(reminder)
-				} catch (err) {
-					console.log('Error in scheduler', JSON.stringify(err))
+					await this.notificationModel.updateOne(
+						{ _id: notification._id },
+						{
+							$addToSet: { sentReminders: reminder },
+						}
+					)
+
+					this.logger.log(
+						`Reminder sent: ${notification._id} at ${reminder.toISOString()}`
+					)
+				} catch (error) {
+					this.logger.error(
+						`Failed to send reminder ${notification._id}`,
+						error.stack
+					)
 				}
 			}
-
-			await notification.save()
 		}
 	}
 }
