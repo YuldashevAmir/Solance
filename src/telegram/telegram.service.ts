@@ -24,10 +24,17 @@ export class TelegramService implements OnModuleInit {
 
 		this.bot.on('text', async ctx => {
 			try {
+				const gmtOffset = Math.round(
+					(Date.now() / 1000 - ctx.message.date) / 3600
+				)
 				const chatId = ctx.chat.id.toString()
 				const userMessage = ctx.message.text
 				const addedNotification =
-					await this.notificationService.addNotification(userMessage, chatId)
+					await this.notificationService.addNotification(
+						userMessage,
+						chatId,
+						gmtOffset
+					)
 
 				const message = getFormattedText(addedNotification)
 				try {

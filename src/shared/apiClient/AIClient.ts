@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { INotification } from '../../notification/notification.types'
 import { ConfigService } from '../config/config.service'
+import { gmtToUTC } from '../utils/date.util'
 
 @Injectable()
 export class AIClient {
@@ -23,7 +24,8 @@ export class AIClient {
 
 	async getAIResponse(
 		userMessage: string,
-		chatId: string
+		chatId: string,
+		gmtOffset: number
 	): Promise<INotification | null> {
 		try {
 			const response = await fetch(this.apiUrl, {
@@ -51,6 +53,12 @@ export class AIClient {
 				typeof aiMessage === 'string' ? JSON.parse(aiMessage) : aiMessage
 
 			parsedData.chatId = chatId
+
+			for (let i = 0; i < parsedData.reminders.length; i++) {
+				parsedData.reminders[i] = gmtToUTC(parsedData.reminders[i], gmtOffset)
+			}
+
+			console.log(parsedData.reminders)
 
 			return parsedData || null
 		} catch (error) {
