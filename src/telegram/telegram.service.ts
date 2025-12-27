@@ -24,6 +24,8 @@ export class TelegramService implements OnModuleInit {
 
 		this.bot.on('text', async ctx => {
 			try {
+				console.log('ctx message date: ', ctx.message.date)
+				console.log('Server Date: ', Date.now())
 				const gmtOffset = Math.round(
 					(Date.now() / 1000 - ctx.message.date) / 3600
 				)
