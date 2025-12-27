@@ -54,9 +54,9 @@ export class AIClient {
 
 			parsedData.chatId = chatId
 
-			for (let i = 0; i < parsedData.reminders.length; i++) {
-				parsedData.reminders[i] = gmtToUTC(parsedData.reminders[i], gmtOffset)
-			}
+			parsedData.reminders = parsedData.reminders.map(reminder =>
+				gmtToUTC(reminder, gmtOffset)
+			)
 
 			console.log(parsedData.reminders)
 
