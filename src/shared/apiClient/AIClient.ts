@@ -53,7 +53,7 @@ export class AIClient {
 				typeof aiMessage === 'string' ? JSON.parse(aiMessage) : aiMessage
 
 			parsedData.chatId = chatId
-
+			console.log(gmtOffset)
 			parsedData.reminders = parsedData.reminders.map(reminder =>
 				gmtToUTC(reminder, gmtOffset)
 			)

@@ -5,6 +5,7 @@
  * @returns UTC Date
  */
 export function gmtToUTC(date: Date | string, gmtOffsetHours: number): Date {
+	console.log(date, '\n', gmtOffsetHours)
 	const d: Date = date instanceof Date ? date : new Date(date)
 
 	if (Number.isNaN(d.getTime())) {
