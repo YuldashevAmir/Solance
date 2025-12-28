@@ -4,7 +4,7 @@ import { ConfigService } from '../config/config.service'
 import { gmtToUTC } from '../utils/date.util'
 
 @Injectable()
-export class AIClient {
+export class aiClientService {
 	private apiKey: string
 	private apiUrl: string
 	private aiModel: string
@@ -35,7 +35,7 @@ export class AIClient {
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
-					model: 'nvidia/nemotron-3-nano-30b-a3b:free',
+					model: this.aiModel,
 					messages: [
 						{
 							role: 'user',
@@ -54,7 +54,7 @@ export class AIClient {
 
 			parsedData.chatId = chatId
 
-			parsedData.reminders = parsedData.reminders.map(reminder =>
+			parsedData.reminders = parsedData.reminders.map((reminder: any) =>
 				gmtToUTC(reminder, GMT_OFFSET)
 			)
 
