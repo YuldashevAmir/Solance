@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { INotification } from '../../notification/notification.types'
 import { ConfigService } from '../config/config.service'
-import { gmtToUTC } from '../utils/date.util'
 
 @Injectable()
 export class aiClientService {
@@ -27,11 +26,7 @@ export class aiClientService {
 		this.logger.log('AI Client initialized successfully')
 	}
 
-	async getAIResponse(
-		userMessage: string,
-		chatId: string,
-		GMT_OFFSET: number
-	): Promise<INotification | null> {
+	async getAIResponse(userMessage: string): Promise<INotification | null> {
 		try {
 			const response = await fetch(this.apiUrl, {
 				method: 'POST',
@@ -52,18 +47,9 @@ export class aiClientService {
 			})
 
 			const data = await response.json()
-			const aiMessage = data.choices?.[0]?.message?.content
+			const aiResponse = data.choices?.[0]?.message?.content
 
-			const parsedData =
-				typeof aiMessage === 'string' ? JSON.parse(aiMessage) : aiMessage
-
-			parsedData.chatId = chatId
-
-			parsedData.reminders = parsedData.reminders.map((reminder: any) =>
-				gmtToUTC(reminder, GMT_OFFSET)
-			)
-
-			return parsedData || null
+			return aiResponse || null
 		} catch (error) {
 			this.logger.error('Error in AI Client getAIResponse', error.stack)
 			return null
