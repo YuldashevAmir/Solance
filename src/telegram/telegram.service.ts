@@ -5,6 +5,7 @@ import { NotificationService } from '../notification/notification.service'
 import { ConfigService } from '../shared/config/config.service'
 import { ERROR_REASONS } from '../shared/messages/error.message'
 import { INFO_MESSAGES } from '../shared/messages/info.messages'
+import { ShoppingService } from '../shopping/shopping.service'
 
 @Injectable()
 export class TelegramService implements OnModuleInit {
@@ -14,7 +15,8 @@ export class TelegramService implements OnModuleInit {
 
 	constructor(
 		private configService: ConfigService,
-		private notificationService: NotificationService
+		private notificationService: NotificationService,
+		private shoppingService: ShoppingService
 	) {
 		this.GMT_OFFSET = Number(this.configService.getTimeZone())
 
@@ -32,25 +34,45 @@ export class TelegramService implements OnModuleInit {
 				const chatId = ctx.chat.id.toString()
 				const userMessage = ctx.message.text
 
-				let addedNotification = await this.notificationService.addNotification(
-					userMessage,
-					chatId
-				)
+				// Check if message starts with "б " or "Б " for shopping
+				if (userMessage.startsWith('б ') || userMessage.startsWith('Б ')) {
+					const shoppingMessage = userMessage.substring(2).trim()
+					const shopping = await this.shoppingService.addShoppingItems(
+						shoppingMessage,
+						chatId
+					)
 
-				this.logger.log(
-					`Notification created for chat ${chatId}: ${addedNotification.message}`
-				)
+					this.logger.log(
+						`Shopping items added for chat ${chatId}: ${shopping.items.length} items`
+					)
 
-				const message = getResponseTextForNotification(
-					addedNotification,
-					this.GMT_OFFSET
-				)
+					const itemsList = shopping.items
+						.map((item, index) => `${index + 1}. ${item.message}`)
+						.join('\n')
 
-				try {
-					await ctx.reply(message, { parse_mode: 'HTML' })
-				} catch (error) {
-					this.logger.error('Error parsing AI response as JSON', error.stack)
-					throw error
+					await ctx.reply(`✅ Список покупок обновлен:\n\n${itemsList}`, {
+						parse_mode: 'HTML',
+					})
+				} else {
+					// Handle as notification
+					let addedNotification =
+						await this.notificationService.addNotification(userMessage, chatId)
+
+					this.logger.log(
+						`Notification created for chat ${chatId}: ${addedNotification.message}`
+					)
+
+					const message = getResponseTextForNotification(
+						addedNotification,
+						this.GMT_OFFSET
+					)
+
+					try {
+						await ctx.reply(message, { parse_mode: 'HTML' })
+					} catch (error) {
+						this.logger.error('Error parsing AI response as JSON', error.stack)
+						throw error
+					}
 				}
 			} catch (error) {
 				this.logger.error('Error in fetching AI response', error.stack)
