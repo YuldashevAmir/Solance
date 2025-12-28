@@ -13,8 +13,8 @@ export class NotificationService {
 	private GMT_OFFSET: number
 
 	constructor(
+		private readonly configService: ConfigService,
 		@InjectModel(Notification.name)
-		private configService: ConfigService,
 		private readonly notificationModel: Model<Notification>,
 		private readonly aiClient: aiClientService
 	) {
