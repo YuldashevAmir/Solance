@@ -27,7 +27,11 @@ export class NotificationService {
 	): Promise<INotification> {
 		this.logger.log(`Processing notification request for chat ${chatId}`)
 
-		const aiResponse = await this.aiClient.getAIResponse(userMessage)
+		const notificationPrompt = this.configService.getNotificationPrompt()
+		const aiResponse = await this.aiClient.getAIResponse(
+			userMessage,
+			notificationPrompt
+		)
 
 		if (!aiResponse) {
 			this.logger.error(`Failed to get AI response for chat ${chatId}`)

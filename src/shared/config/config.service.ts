@@ -39,7 +39,11 @@ export class ConfigService {
 		return this.get('AI_API_URL')
 	}
 
-	getAiApiPrompt(): string {
-		return this.get('AI_API_PROMPT')
+	getNotificationPrompt(): string {
+		return this.get('NOTIFICATION_PROMPT')
+	}
+
+	getShoppingPrompt(): string {
+		return this.get('SHOPPING_PROMPT')
 	}
 }
