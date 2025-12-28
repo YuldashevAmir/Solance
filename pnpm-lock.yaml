@@ -26,9 +26,6 @@ importers:
       '@nestjs/schedule':
         specifier: ^6.1.0
         version: 6.1.0(@nestjs/common@11.1.9(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.9)
-      Solance:
-        specifier: 'link:'
-        version: 'link:'
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
