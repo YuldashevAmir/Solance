@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { INotification } from '../../notification/notification.types'
 import { ConfigService } from '../config/config.service'
 import { gmtToUTC } from '../utils/date.util'
 
 @Injectable()
 export class aiClientService {
+	private readonly logger = new Logger(aiClientService.name)
+
 	private apiKey: string
 	private apiUrl: string
 	private aiModel: string
@@ -17,9 +19,12 @@ export class aiClientService {
 		this.aiPrompt = this.configService.get('AI_API_PROMPT')!
 
 		if (!this.apiKey || !this.apiUrl || !this.aiModel || !this.aiPrompt) {
-			console.log(this.apiKey, this.apiUrl, this.aiModel, this.aiPrompt)
+			this.logger.error(
+				`AI API configuration missing: key=${!!this.apiKey}, url=${!!this.apiUrl}, model=${!!this.aiModel}, prompt=${!!this.aiPrompt}`
+			)
 			throw new Error('AI API key, URL, model, or prompt is missing!')
 		}
+		this.logger.log('AI Client initialized successfully')
 	}
 
 	async getAIResponse(
@@ -60,7 +65,7 @@ export class aiClientService {
 
 			return parsedData || null
 		} catch (error) {
-			console.error('Error in AIClient getAIResponse:', error)
+			this.logger.error('Error in AI Client getAIResponse', error.stack)
 			return null
 		}
 	}
