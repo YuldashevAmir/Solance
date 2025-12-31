@@ -8,11 +8,13 @@ export class aiClientService {
 	private apiKey: string
 	private apiUrl: string
 	private aiModel: string
+	private GMT_OFFSET: number
 
 	constructor(private readonly configService: ConfigService) {
 		this.apiKey = this.configService.get('AI_API_KEY')!
 		this.apiUrl = this.configService.get('AI_API_URL')!
 		this.aiModel = this.configService.get('AI_API_MODEL')!
+		this.GMT_OFFSET = Number(this.configService.getTimeZone())
 
 		if (!this.apiKey || !this.apiUrl || !this.aiModel) {
 			this.logger.error(
@@ -39,7 +41,7 @@ export class aiClientService {
 					messages: [
 						{
 							role: 'user',
-							content: `${prompt}\nToday is ${new Date().toISOString().split('T')[0]} \nUser Message: ${userMessage}`,
+							content: `${prompt}\ГUser timezone is ${this.GMT_OFFSET} \nUser Message: ${userMessage}`,
 						},
 					],
 					reasoning: { enabled: true },
