@@ -6,6 +6,7 @@ import { getNearestMonday } from 'src/shared/utils/date.util'
 import { aiClientService } from '../shared/apiClient/aiClient.service'
 import { Shopping } from './shopping.schema'
 import { IShopping, IShoppingItem } from './shopping.types'
+import { extractFirstJson } from 'src/shared/utils/textFormat.util'
 
 @Injectable()
 export class ShoppingService {
@@ -39,7 +40,7 @@ export class ShoppingService {
 		}
 
 		const parsedAiResponse =
-			typeof aiResponse === 'string' ? JSON.parse(aiResponse) : aiResponse
+			typeof aiResponse === 'string' ? extractFirstJson(aiResponse) : aiResponse
 
 		if (!parsedAiResponse.items || !Array.isArray(parsedAiResponse.items)) {
 			throw new Error('Invalid AI response structure')
