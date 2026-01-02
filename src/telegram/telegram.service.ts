@@ -5,7 +5,8 @@ import { NotificationService } from '../notification/notification.service'
 import { ConfigService } from '../shared/config/config.service'
 import { ERROR_REASONS } from '../shared/messages/error.message'
 import { INFO_MESSAGES } from '../shared/messages/info.messages'
-import { ShoppingService } from '../shopping/shopping.service'
+
+import { ShoppingService } from './../shopping/shopping.service'
 
 @Injectable()
 export class TelegramService implements OnModuleInit {
@@ -33,49 +34,17 @@ export class TelegramService implements OnModuleInit {
 			try {
 				const chatId = ctx.chat.id.toString()
 				const userMessage = ctx.message.text
+				const lowerText = userMessage.trim().toLowerCase()
 
-				// Check if message starts with "б " or "Б " for shopping
-				if (userMessage.startsWith('б ') || userMessage.startsWith('Б ')) {
-					const shoppingMessage = userMessage.substring(2).trim()
-					const shopping = await this.shoppingService.addShoppingItems(
-						shoppingMessage,
-						chatId
-					)
-
-					this.logger.log(
-						`Shopping items added for chat ${chatId}: ${shopping.items.length} items`
-					)
-
-					const itemsList = shopping.items
-						.map((item, index) => `${index + 1}. ${item.message}`)
-						.join('\n')
-
-					await ctx.reply(`✅ Список покупок обновлен:\n\n${itemsList}`, {
-						parse_mode: 'HTML',
-					})
-				} else {
-					// Handle as notification
-					let addedNotification =
-						await this.notificationService.addNotification(userMessage, chatId)
-
-					this.logger.log(
-						`Notification created for chat ${chatId}: ${addedNotification.message}`
-					)
-
-					const message = getResponseTextForNotification(
-						addedNotification,
-						this.GMT_OFFSET
-					)
-
-					try {
-						await ctx.reply(message, { parse_mode: 'HTML' })
-					} catch (error) {
-						this.logger.error('Error parsing AI response as JSON', error.stack)
-						throw error
-					}
+				switch (true) {
+					case lowerText.startsWith('б '):
+						await this.handleShoppingRequest(ctx, chatId, userMessage)
+						break
+					default:
+						await this.processNotification(ctx, chatId, userMessage)
 				}
 			} catch (error) {
-				this.logger.error('Error in fetching AI response', error.stack)
+				this.logger.error('Error processing user message', error.stack)
 				ctx.reply(ERROR_REASONS.DEFAULT)
 			}
 		})
@@ -88,6 +57,53 @@ export class TelegramService implements OnModuleInit {
 			.catch(err => {
 				this.logger.error('Error launching the Telegram bot', err.stack)
 			})
+	}
+
+	private async handleShoppingRequest(
+		ctx: any,
+		chatId: string,
+		userMessage: string
+	) {
+		let addedShoppingItems = await this.shoppingService.addShoppingItems(
+			userMessage,
+			chatId
+		)
+		this.logger.log(
+			`Shopping items created for chat ${chatId}: ${addedShoppingItems.join('')}`
+		)
+		const message = addedShoppingItems.join('\n')
+
+		try {
+			await ctx.reply(message, { parse_mode: 'HTML' })
+		} catch (error) {
+			this.logger.error('Error parsing AI response as JSON', error.stack)
+			throw error
+		}
+	}
+
+	private async processNotification(
+		ctx: any,
+		chatId: string,
+		userMessage: string
+	) {
+		let addedNotification = await this.notificationService.addNotification(
+			userMessage,
+			chatId
+		)
+		this.logger.log(
+			`Notification created for chat ${chatId}: ${addedNotification.message}`
+		)
+		const message = getResponseTextForNotification(
+			addedNotification,
+			this.GMT_OFFSET
+		)
+
+		try {
+			await ctx.reply(message, { parse_mode: 'HTML' })
+		} catch (error) {
+			this.logger.error('Error parsing AI response as JSON', error.stack)
+			throw error
+		}
 	}
 
 	stopBot() {

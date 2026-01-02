@@ -1,22 +1,13 @@
 import { Module } from '@nestjs/common'
-import { MongooseModule } from '@nestjs/mongoose'
-import { AIClientModule } from '../shared/apiClient/aiClient.module'
-import { ConfigModule } from '../shared/config/config.module'
-import { ShoppingSchema } from './shopping.schema'
+
+import { aiClientService } from 'src/shared/apiClient/aiClient'
+import { TodoistClient } from 'src/shared/apiClient/todoistClient'
+import { ConfigModule } from 'src/shared/config/config.module'
 import { ShoppingService } from './shopping.service'
-import { ShoppingController } from './shopping.controller'
 
 @Module({
-	imports: [
-		MongooseModule.forFeature([
-			{ name: 'Shopping', schema: ShoppingSchema },
-		]),
-		ConfigModule,
-		AIClientModule,
-	],
-	providers: [ShoppingService],
+	imports: [ConfigModule],
+	providers: [ShoppingService, aiClientService, TodoistClient],
 	exports: [ShoppingService],
-	controllers: [ShoppingController],
 })
 export class ShoppingModule {}
-

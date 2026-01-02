@@ -46,4 +46,12 @@ export class ConfigService {
 	getShoppingPrompt(): string {
 		return this.get('SHOPPING_PROMPT')
 	}
+
+	getShoppingProjectId(): string {
+		return this.get('TODOIST_SHOPPING_PROJECT_ID')
+	}
+
+	getTodoistApiKey(): string {
+		return this.get('TODOIST_API_KEY')
+	}
 }

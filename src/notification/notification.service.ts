@@ -3,10 +3,10 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { ConfigService } from 'src/shared/config/config.service'
 import { gmtToUTC } from 'src/shared/utils/date.util'
-import { aiClientService } from '../shared/apiClient/aiClient.service'
+import { extractFirstJson } from 'src/shared/utils/textFormat.util'
+import { aiClientService } from '../shared/apiClient/aiClient'
 import { Notification } from './notification.schema'
 import { INotification } from './notification.types'
-import { extractFirstJson } from 'src/shared/utils/textFormat.util'
 
 @Injectable()
 export class NotificationService {
@@ -33,8 +33,6 @@ export class NotificationService {
 			userMessage,
 			notificationPrompt
 		)
-
-		console.log(aiResponse)
 
 		if (!aiResponse) {
 			this.logger.error(`Failed to get AI response for chat ${chatId}`)
