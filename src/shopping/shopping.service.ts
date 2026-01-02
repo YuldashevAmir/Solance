@@ -35,14 +35,17 @@ export class ShoppingService {
 			throw new Error('Failed to get a valid response from AI service')
 		}
 
-		const parsedAiResponse =
+		const parsedAiResponse: { items: { bought: boolean; message: string }[] } =
 			typeof aiResponse === 'string' ? extractFirstJson(aiResponse) : aiResponse
+
+		const addedItems: string[] = []
 
 		for (const item of parsedAiResponse.items) {
 			await this.todoistClient.addTask(item.message, this.PROJECT_ID)
+			addedItems.push(item.message)
 			this.logger.log(`Shopping item saved for chat ${chatId}: ${item}`)
 		}
 
-		return parsedAiResponse.items
+		return addedItems
 	}
 }
